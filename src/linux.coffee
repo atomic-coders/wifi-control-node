@@ -221,3 +221,65 @@ module.exports =
       stdout = @execSync COMMANDS[com]
       _msg = "Success!"
       @WiFiLog _msg
+
+  #
+  # With Linux, we can use nmcli to do the heavy lifting.
+  #
+  disconnectFromAP: ( _ap ) ->
+    #
+    # (1) Does a connection that matches the name of the ssid
+    #     already exist?
+    #
+    COMMANDS =
+      delete: "nmcli connection delete \"#{_ap.ssid}\""
+    try
+      stdout = @execSync "nmcli connection show \"#{_ap.ssid}\""
+      ssidExist = true if stdout.length
+    catch error
+      ssidExist = false
+
+    #
+    # (2) Delete the old connection, if there is one.
+    #     Then, create a new connection.
+    #
+    disconnectFromAPChain = []
+    if ssidExist
+      @WiFiLog "It appears there is already a connection for this SSID."
+      disconnectFromAPChain.push "delete"
+
+    #
+    # (3) Connect to AP using using the above constructed
+    #     command chain.
+    #
+    for com in disconnectFromAPChain
+      @WiFiLog "Executing:\t#{COMMANDS[com]}"
+      #
+      # Run the command, handle any errors that get thrown.
+      #
+      try
+        stdout = @execSync COMMANDS[com]
+      catch error
+        if error.stderr.toString().trim() is "Error: No network with SSID '#{_ap.ssid}' found."
+          _msg = "Error: No network called #{_ap.ssid} could be found."
+          @WiFiLog _msg, true
+          return {
+            success: false
+            msg: _msg
+          }
+        else if error.stderr.toString().search /Error:/ != -1
+          _msg = error.stderr.toString().trim()
+          @WiFiLog _msg, true
+          return {
+            success: false
+            msg: _msg
+          }
+        # Ignore nmcli's add/modify errors, this is a system bug
+        @WiFiLog error, true
+        return {
+          success: false
+          msg: error
+        }
+      #
+      # Otherwise, so far so good!
+      #
+      @WiFiLog "Success!"

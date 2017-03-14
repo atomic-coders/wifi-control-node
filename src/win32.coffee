@@ -242,3 +242,6 @@ module.exports =
       stdout = @execSync COMMANDS[com]
       _msg = "Success!"
       @WiFiLog _msg
+
+  connectToAP: ( _ap ) ->
+    throw new Error("Not yet implemented")

@@ -135,3 +135,21 @@ module.exports =
       stdout = @execSync COMMANDS[com]
       _msg = "Success!"
       @WiFiLog _msg
+
+  disconnectFromAP: ( _ap ) ->
+    COMMANDS =
+      disconnect: "networksetup -removepreferredwirelessnetwork #{@WiFiControlSettings.iface} \"#{_ap.ssid}\""
+    disconnectFromAPChain = [ "connect" ]
+    for com in disconnectFromAPChain
+      @WiFiLog "Executing:\t#{COMMANDS[com]}"
+      try
+        stdout = @execSync COMMANDS[com]
+      catch error
+      if stdout is "Could not find network #{_ap.ssid}."
+        _msg = "Error: No network called #{_ap.ssid} could be found."
+        @WiFiLog _msg, true
+        return {
+          success: false
+          msg: _msg
+        }
+      @WiFiLog "Success!"
