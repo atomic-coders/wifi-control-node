@@ -139,7 +139,7 @@ module.exports =
   disconnectFromAP: ( _ap ) ->
     COMMANDS =
       disconnect: "networksetup -removepreferredwirelessnetwork #{@WiFiControlSettings.iface} \"#{_ap.ssid}\""
-    disconnectFromAPChain = [ "connect" ]
+    disconnectFromAPChain = [ "disconnect" ]
     for com in disconnectFromAPChain
       @WiFiLog "Executing:\t#{COMMANDS[com]}"
       try
