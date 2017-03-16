@@ -2,7 +2,7 @@
 # (1) Load NPM Dependencies.
 #
 # node-wifiscanner2 is a great NPM package for scanning WiFi APs (for Windows & Mac -- it REQUIRES sudo on Linux).
-WiFiScanner = require 'node-wifiscanner2'
+WiFiScanner = require './wifiscanner'
 # To execute commands in the host machine, we'll use sync-exec.
 # Note: In nodejs >= v0.12 this will default to child_process.execSync.
 execSyncToBuffer = require 'sync-exec'
